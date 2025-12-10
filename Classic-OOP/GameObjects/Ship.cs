@@ -2,7 +2,7 @@
 using System.Numerics;
 using Raylib_cs; // Still needed for Vector/Color, but NOT for Input
 
-namespace Classic_OOP
+namespace Classic_OOP.GameObjects
 {
     public class Ship : GameObject
     {

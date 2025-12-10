@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Raylib_cs;
 
-namespace Classic_OOP
+namespace Classic_OOP.GameObjects
 {
     public enum AsteroidSize { Small, Medium, Large }
 

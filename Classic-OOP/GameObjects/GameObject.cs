@@ -1,9 +1,10 @@
 ﻿using System.Numerics;
+using Classic_OOP.Interfaces;
 using Raylib_cs;
 
-namespace Classic_OOP
+namespace Classic_OOP.GameObjects
 {
-    public abstract class GameObject
+    public abstract class GameObject : IGameObject
     {
         public Vector2 Position;
         public Vector2 Velocity;
@@ -12,11 +13,14 @@ namespace Classic_OOP
         public Color Color;
         public bool Active = true;
 
+        private List<GameObject> _gameObjects;
+
         protected GameObject(Vector2 position, Vector2 velocity)
         {
             Position = position;
             Velocity = velocity;
             Color = Color.White;
+            _gameObjects = new List<GameObject>();
         }
 
         public abstract void Update(float deltaTime);

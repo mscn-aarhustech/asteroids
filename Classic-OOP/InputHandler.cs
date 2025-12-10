@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using Classic_OOP.GameObjects;
+using Raylib_cs;
 
 namespace Classic_OOP
 {
