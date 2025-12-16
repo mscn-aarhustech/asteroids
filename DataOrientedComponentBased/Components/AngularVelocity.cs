@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DataOrientedComponentBased.Components
 {
-    public struct Rotation
+    public struct AngularVelocity
     {
         public float Value;
     }
