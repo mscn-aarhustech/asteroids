@@ -9,8 +9,9 @@ namespace Classic_OOP.GameObjects
     {
         public AsteroidSize SizeCategory;
         public float Radius;
+        public float AngularVelocity;
 
-        public Asteroid(Vector2 position, Vector2 velocity, AsteroidSize size) : base(position, velocity)
+        public Asteroid(Vector2 position, Vector2 velocity, float angularVelocity, AsteroidSize size) : base(position, velocity)
         {
             SizeCategory = size;
 
@@ -20,12 +21,14 @@ namespace Classic_OOP.GameObjects
                 case AsteroidSize.Medium: Radius = 20; break;
                 case AsteroidSize.Small: Radius = 10; break;
             }
+
+            AngularVelocity = angularVelocity;
         }
 
         public override void Update(float dt)
         {
             Position += Velocity * dt;
-            Rotation += 30 * dt;
+            Rotation += AngularVelocity * dt;
             ScreenWrap(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
         }
 

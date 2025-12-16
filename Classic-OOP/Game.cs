@@ -11,21 +11,22 @@ namespace Classic_OOP
         private Ship _ship;
         private readonly List<Asteroid> _asteroids;
         private readonly List<Bullet> _bullets;
+        private readonly List<Particle> _particles;
         private readonly Random _rnd;
-        private readonly InputHandler _input; // Reference to the controller
+        private readonly InputHandler _input;
 
         private const int ScreenWidth = 800;
         private const int ScreenHeight = 800;
 
-        // Expose state safely to InputHandler
         public bool IsGameOver { get; private set; }
 
         public Game()
         {
             _asteroids = new List<Asteroid>();
             _bullets = new List<Bullet>();
+            _particles = new List<Particle>();
             _rnd = new Random();
-            _input = new InputHandler(); // Initialize Handler
+            _input = new InputHandler();
         }
 
         public void Run()
@@ -39,20 +40,16 @@ namespace Classic_OOP
             {
                 float dt = Raylib.GetFrameTime();
 
-                // 1. Process Input
                 _input.HandleInput(this, _ship, dt);
 
-                // 2. Update Logic
                 Update(dt);
 
-                // 3. Draw
                 Draw();
             }
 
             Raylib.CloseWindow();
         }
 
-        // Made public so InputHandler can call it
         public void Restart()
         {
             ResetGame();
@@ -63,11 +60,13 @@ namespace Classic_OOP
             _ship = new Ship(new Vector2(ScreenWidth / 2, ScreenHeight / 2));
             _asteroids.Clear();
             _bullets.Clear();
+            _particles.Clear();
+
             IsGameOver = false;
 
             for (int i = 0; i < 5; i++)
             {
-                SpawnAsteroid(AsteroidSize.Large, GetRandomEdgePosition());
+                SpawnAsteroid(AsteroidSize.Large, GetRandomEdgePosition(), new Vector2());
             }
         }
 
@@ -75,32 +74,40 @@ namespace Classic_OOP
         {
             if (IsGameOver) return;
 
-            // Note: Ship.Update only handles physics now
             _ship.Update(dt);
 
             foreach (var asteroid in _asteroids) asteroid.Update(dt);
             foreach (var bullet in _bullets) bullet.Update(dt);
+            foreach (var particle in _particles) particle.Update(dt);
 
             CheckCollisions();
 
             _asteroids.RemoveAll(a => !a.Active);
             _bullets.RemoveAll(b => !b.Active);
+            _particles.RemoveAll(p => !p.Active);
         }
 
-        // Made public (or internal) so InputHandler can trigger shooting
         public void SpawnBullet()
         {
-            // Prevent shooting if ship is dead or game is over
             if (IsGameOver) return;
 
             float radians = _ship.Rotation * (MathF.PI / 180.0f);
             Vector2 direction = new Vector2(MathF.Sin(radians), -MathF.Cos(radians));
             Vector2 velocity = direction * 500.0f;
 
-            _bullets.Add(new Bullet(_ship.Position + direction * 20, velocity));
+            _bullets.Add(new Bullet(_ship.Position + direction * 20, _ship.Velocity + velocity));
         }
 
-        // ... (Remaining methods: Draw, SpawnAsteroid, CheckCollisions, etc. are unchanged) ...
+        public void SpawnParticles(Vector2 position, Vector2 velocity, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                float angle = _rnd.Next(0, 360) * (MathF.PI / 180.0f);
+                float speed = _rnd.Next(5, 75);
+                Vector2 vel = velocity + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * speed;
+                _particles.Add(new Particle(position, vel));
+            }
+        }
 
         private void Draw()
         {
@@ -117,23 +124,24 @@ namespace Classic_OOP
                 _ship.Draw();
                 foreach (var asteroid in _asteroids) asteroid.Draw();
                 foreach (var bullet in _bullets) bullet.Draw();
+                foreach (var particle in _particles) particle.Draw();
                 Raylib.DrawText($"Asteroids: {_asteroids.Count}", 10, 10, 20, Color.Green);
             }
 
             Raylib.EndDrawing();
         }
 
-        private void SpawnAsteroid(AsteroidSize size, Vector2 pos)
+        private void SpawnAsteroid(AsteroidSize size, Vector2 pos, Vector2 vel)
         {
-            float speed = _rnd.Next(50, 150);
+            float speed = _rnd.Next(20, 70);
             float angle = _rnd.Next(0, 360) * (MathF.PI / 180.0f);
-            Vector2 vel = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * speed;
-            _asteroids.Add(new Asteroid(pos, vel, size));
+            float angularVelocity = _rnd.Next(-50, 50);
+            Vector2 velocity = vel + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * speed;
+            _asteroids.Add(new Asteroid(pos, velocity, angularVelocity, size));
         }
 
         private void CheckCollisions()
         {
-            // ... (Same collision logic as previous) ...
             foreach (var bullet in _bullets)
             {
                 foreach (var asteroid in _asteroids)
@@ -162,13 +170,19 @@ namespace Classic_OOP
         {
             if (parent.SizeCategory == AsteroidSize.Large)
             {
-                SpawnAsteroid(AsteroidSize.Medium, parent.Position);
-                SpawnAsteroid(AsteroidSize.Medium, parent.Position);
+                SpawnAsteroid(AsteroidSize.Medium, parent.Position, parent.Velocity);
+                SpawnAsteroid(AsteroidSize.Medium, parent.Position, parent.Velocity);
+                SpawnParticles(parent.Position, parent.Velocity, 10);
             }
             else if (parent.SizeCategory == AsteroidSize.Medium)
             {
-                SpawnAsteroid(AsteroidSize.Small, parent.Position);
-                SpawnAsteroid(AsteroidSize.Small, parent.Position);
+                SpawnAsteroid(AsteroidSize.Small, parent.Position, parent.Velocity);
+                SpawnAsteroid(AsteroidSize.Small, parent.Position, parent.Velocity);
+                SpawnParticles(parent.Position, parent.Velocity, 10);
+            }
+            else if (parent.SizeCategory == AsteroidSize.Small)
+            {
+                SpawnParticles(parent.Position, parent.Velocity, 10);
             }
         }
 

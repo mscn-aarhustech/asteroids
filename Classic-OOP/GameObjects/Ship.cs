@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using Raylib_cs; // Still needed for Vector/Color, but NOT for Input
+using Raylib_cs;
 
 namespace Classic_OOP.GameObjects
 {
@@ -16,11 +16,10 @@ namespace Classic_OOP.GameObjects
             Size = new Vector2(20, 20);
         }
 
-        // Standard physics update - runs every frame regardless of input
         public override void Update(float dt)
         {
             Position += Velocity * dt;
-            //Velocity *= Friction; // Drag is always applied
+            //Velocity *= Friction; // Drag
             ScreenWrap(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
         }
 
@@ -28,7 +27,6 @@ namespace Classic_OOP.GameObjects
 
         public void Rotate(float direction, float dt)
         {
-            // direction: -1 (Left) or 1 (Right)
             Rotation += (RotationSpeed * direction) * dt;
         }
 

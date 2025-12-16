@@ -13,14 +13,11 @@ namespace Classic_OOP.GameObjects
         public Color Color;
         public bool Active = true;
 
-        private List<GameObject> _gameObjects;
-
         protected GameObject(Vector2 position, Vector2 velocity)
         {
             Position = position;
             Velocity = velocity;
             Color = Color.White;
-            _gameObjects = new List<GameObject>();
         }
 
         public abstract void Update(float deltaTime);

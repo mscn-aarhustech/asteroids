@@ -1,14 +1,22 @@
-﻿using System.Numerics;
-using Raylib_cs;
+﻿using Raylib_cs;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Text;
 
 namespace Classic_OOP.GameObjects
 {
-    public class Bullet : GameObject
+    public class Particle : GameObject
     {
         private float _lifeTime = 2.0f;
 
-        public Bullet(Vector2 position, Vector2 velocity) : base(position, velocity)
+        public Particle(Vector2 position, Vector2 velocity) : base(position, velocity)
         {
+        }
+
+        public override void Draw()
+        {
+            Raylib.DrawCircleV(Position, 1, Color);
         }
 
         public override void Update(float dt)
@@ -25,11 +33,6 @@ namespace Classic_OOP.GameObjects
 
             _lifeTime -= dt;
             if (_lifeTime <= 0) Active = false;
-        }
-
-        public override void Draw()
-        {
-            Raylib.DrawCircleV(Position, 2, Color);
         }
     }
 }
